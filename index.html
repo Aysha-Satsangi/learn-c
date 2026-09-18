@@ -1,0 +1,1272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>C Steps: learn C one program at a time</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --paper: #F2F5F7;
+  --grid: #E2E9EE;
+  --ink: #1A2735;
+  --muted: #55636F;
+  --line: #C9D3DC;
+  --surface: #FFFFFF;
+  --mark: #FFE45C;
+  --mark-ink: #1A2735;
+  --code-bg: #1D2330;
+  --code-ink: #E3E7EE;
+  --term-dim: #8792A6;
+  --ok: #1B6E42;
+  --ok-bg: #E2F2E8;
+  --bad: #A8221A;
+  --bad-bg: #FBE8E6;
+  --link: #1F4FA0;
+  --warn-bg: #FFF7D6;
+  --warn-line: #E0C23A;
+  --sans: "Atkinson Hyperlegible", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --paper: #11161D; --grid: #182029; --ink: #E3E8EE; --muted: #9AA6B2; --line: #2B3541;
+    --surface: #18202A; --mark: #E9CB3F; --mark-ink: #11161D; --code-bg: #0B0F15; --code-ink: #E3E7EE;
+    --ok: #74D39E; --ok-bg: #16301F; --bad: #FF8E80; --bad-bg: #3A1B18; --link: #8EB5F6;
+    --warn-bg: #2A2612; --warn-line: #8C7A24;
+  }
+}
+:root[data-theme="dark"] {
+  --paper: #11161D; --grid: #182029; --ink: #E3E8EE; --muted: #9AA6B2; --line: #2B3541;
+  --surface: #18202A; --mark: #E9CB3F; --mark-ink: #11161D; --code-bg: #0B0F15; --code-ink: #E3E7EE;
+  --ok: #74D39E; --ok-bg: #16301F; --bad: #FF8E80; --bad-bg: #3A1B18; --link: #8EB5F6;
+  --warn-bg: #2A2612; --warn-line: #8C7A24;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+body {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  color: var(--ink);
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+a { color: var(--link); }
+:focus-visible { outline: 3px solid var(--link); outline-offset: 2px; border-radius: 3px; }
+img { max-width: 100%; }
+code { font-family: var(--mono); font-size: .88em; background: var(--surface); border: 1px solid var(--line); border-radius: 4px; padding: .05em .3em; }
+button { font: inherit; color: inherit; cursor: pointer; }
+pre code { background: none; border: 0; padding: 0; font-size: inherit; border-radius: 0; color: inherit; }
+
+/* top bar */
+.topbar {
+  position: sticky; top: 0; z-index: 20;
+  display: flex; align-items: center; gap: 1rem;
+  padding: .6rem 1.25rem;
+  background: var(--surface);
+  border-bottom: 2px solid var(--ink);
+}
+.brand { display: flex; align-items: baseline; gap: .5rem; text-decoration: none; color: var(--ink); }
+.brand b { font-family: var(--mono); font-weight: 600; font-size: 1.35rem; background: var(--mark); color: var(--mark-ink); padding: 0 .35rem; border-radius: 3px; }
+.brand span { font-weight: 700; font-size: 1.1rem; }
+.progress { margin-left: auto; display: flex; align-items: center; gap: .6rem; font-size: .9rem; color: var(--muted); }
+.bar { width: 120px; height: 8px; border: 1px solid var(--ink); border-radius: 4px; overflow: hidden; background: var(--paper); }
+.bar i { display: block; height: 100%; background: var(--ink); width: 0; transition: width .3s; }
+.menu-btn { display: none; background: none; border: 1px solid var(--line); border-radius: 6px; padding: .3rem .7rem; }
+
+/* layout */
+.layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); max-width: 1180px; margin: 0 auto; }
+nav.lessons { position: sticky; top: 58px; align-self: start; max-height: calc(100vh - 58px); overflow-y: auto; padding: 1.5rem 1rem 2rem 1.25rem; }
+nav.lessons h2 { font-size: .95rem; margin: 0 0 .6rem .5rem; border: 0; padding: 0; color: var(--muted); font-weight: 400; }
+nav.lessons ol { list-style: none; margin: 0; padding: 0; }
+nav.lessons a {
+  display: grid; grid-template-columns: 2rem 1fr auto; align-items: center;
+  padding: .45rem .5rem; border-radius: 6px; text-decoration: none; color: var(--ink); line-height: 1.3;
+}
+nav.lessons a:hover { background: var(--surface); }
+nav.lessons a[aria-current="page"] { background: var(--mark); color: var(--mark-ink); font-weight: 700; }
+nav.lessons .num { font-family: var(--mono); font-size: .85rem; color: var(--muted); }
+nav.lessons a[aria-current="page"] .num { color: var(--mark-ink); }
+nav.lessons .tick { font-size: .85rem; color: var(--ok); font-weight: 700; }
+nav.lessons a[aria-current="page"] .tick { color: var(--mark-ink); }
+nav.lessons .home-link { grid-template-columns: 1fr; margin-bottom: .75rem; }
+
+main { padding: 2rem 1.5rem 5rem; min-width: 0; }
+article { max-width: 70ch; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 2rem 2.25rem 2.5rem; }
+.crumb { margin: 0 0 .25rem; color: var(--muted); font-size: .95rem; }
+h1 { font-size: clamp(1.9rem, 4vw, 2.6rem); line-height: 1.15; margin: 0 0 .5rem; letter-spacing: -.01em; }
+.lede { font-size: 1.2rem; color: var(--muted); margin: 0 0 1.5rem; }
+h2 { font-size: 1.35rem; margin: 2.5rem 0 .75rem; padding-top: 1.25rem; border-top: 2px solid var(--ink); }
+h3 { font-size: 1.05rem; margin: 0 0 .4rem; }
+article ul { padding-left: 1.2rem; }
+article li { margin: .2rem 0; }
+
+/* code */
+.code { position: relative; margin: 1rem 0 0; border-radius: 8px; background: var(--code-bg); color: var(--code-ink); }
+.code pre { margin: 0; padding: 1rem 1.1rem; overflow-x: auto; font-family: var(--mono); font-size: .88rem; line-height: 1.55; tab-size: 4; }
+.code .copy {
+  position: absolute; top: .5rem; right: .5rem;
+  background: transparent; color: var(--term-dim); border: 1px solid #3A4456; border-radius: 5px;
+  font-size: .78rem; padding: .15rem .55rem;
+}
+.code .copy:hover { color: var(--code-ink); border-color: var(--code-ink); }
+.tk-kw { color: #FF9E64; }
+.tk-str { color: #A8DB8F; }
+.tk-com { color: #7C879B; font-style: italic; }
+.tk-pre { color: #86AFFF; }
+.tk-num { color: #F5CB6E; }
+.tk-fn { color: #7FDBCA; }
+pre.cmd { font-family: var(--mono); font-size: .88rem; background: var(--code-bg); color: var(--code-ink); padding: .7rem 1rem; border-radius: 6px; overflow-x: auto; margin: .5rem 0; }
+
+.output { margin: 0 0 1rem; border: 1px solid var(--code-bg); border-top: 0; border-radius: 0 0 8px 8px; background: var(--paper); }
+.code.has-output { border-radius: 8px 8px 0 0; }
+.output .label { display: block; padding: .35rem 1.1rem 0; font-size: .82rem; color: var(--muted); }
+.output pre { margin: 0; padding: .2rem 1.1rem .8rem; font-family: var(--mono); font-size: .88rem; white-space: pre-wrap; overflow-x: auto; }
+
+/* predict */
+.predict { border: 2px solid var(--ink); border-radius: 10px; padding: 1.1rem 1.1rem 1.25rem; margin-top: 1rem; }
+.predict > p { margin: .9rem 0 .6rem; font-weight: 700; }
+.choices { display: grid; gap: .5rem; }
+.choice {
+  display: block; width: 100%; text-align: left;
+  background: var(--surface); border: 1px solid var(--line); border-radius: 6px;
+  padding: .55rem .8rem; font-family: var(--mono); font-size: .9rem; white-space: pre-wrap;
+}
+.choice:hover:not([disabled]) { border-color: var(--ink); }
+.choice[disabled] { cursor: default; }
+.choice.right { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); font-weight: 600; }
+.choice.wrong { background: var(--bad-bg); border-color: var(--bad); color: var(--bad); text-decoration: line-through; }
+.feedback { margin-top: .75rem; padding: .6rem .8rem; border-radius: 6px; border-left: 4px solid; }
+.feedback.good { background: var(--ok-bg); border-color: var(--ok); }
+.feedback.nope { background: var(--bad-bg); border-color: var(--bad); }
+.feedback b { display: block; }
+.term-print { font-family: var(--mono); background: var(--code-bg); color: var(--code-ink); border-radius: 6px; padding: .6rem .9rem; margin-top: .6rem; white-space: pre-wrap; }
+.term-print::before { content: "$ ./a.out\A"; color: var(--term-dim); white-space: pre; }
+.term-print.file::before { content: "$ cat log.txt\A"; }
+
+/* quiz */
+.q { margin: 1.25rem 0; }
+.q > p { margin: 0 0 .5rem; font-weight: 700; }
+.q .choice { font-family: var(--sans); font-size: 1rem; }
+
+/* mistake */
+.mistake { margin-top: 2rem; background: var(--warn-bg); border-left: 5px solid var(--warn-line); border-radius: 0 8px 8px 0; padding: .9rem 1.1rem; }
+.mistake p { margin: 0; }
+
+/* practice */
+details { margin-top: .75rem; border: 1px solid var(--line); border-radius: 8px; }
+summary { cursor: pointer; padding: .6rem .9rem; font-weight: 700; }
+details[open] summary { border-bottom: 1px solid var(--line); }
+details > div { padding: .8rem .9rem; }
+details .code { margin-top: 0; }
+
+/* lesson end */
+.lesson-end { margin-top: 2.5rem; padding-top: 1.25rem; border-top: 2px solid var(--ink); display: flex; flex-wrap: wrap; gap: .75rem; align-items: center; }
+.btn { display: inline-block; text-decoration: none; border-radius: 8px; padding: .6rem 1.1rem; font-weight: 700; border: 2px solid var(--ink); background: var(--surface); color: var(--ink); }
+.btn.primary { background: var(--ink); color: var(--surface); }
+.btn.done { background: var(--ok-bg); border-color: var(--ok); color: var(--ok); }
+.lesson-end .spacer { flex: 1; }
+
+/* home */
+.hero { display: grid; gap: 1.5rem; }
+.hero h1 { font-size: clamp(2.2rem, 5.5vw, 3.4rem); max-width: 16ch; }
+.hero-term { background: var(--code-bg); color: var(--code-ink); border-radius: 10px; font-family: var(--mono); font-size: .92rem; overflow: hidden; }
+.hero-term pre { margin: 0; padding: 1rem 1.2rem; overflow-x: auto; }
+.hero-term .run { border-top: 1px solid #2E3747; padding: .8rem 1.2rem 1rem; min-height: 5.2rem; white-space: pre-wrap; }
+.hero-term .dim { color: var(--term-dim); }
+.caret { display: inline-block; width: .55em; height: 1.1em; background: var(--code-ink); vertical-align: text-bottom; animation: blink 1s steps(1) infinite; }
+@keyframes blink { 50% { opacity: 0; } }
+.steps { counter-reset: s; list-style: none; padding: 0; margin: 0; }
+.steps li { counter-increment: s; display: grid; grid-template-columns: 2.2rem 1fr; margin: .6rem 0; }
+.steps li::before { content: counter(s); font-family: var(--mono); font-weight: 600; width: 1.6rem; height: 1.6rem; border-radius: 50%; border: 2px solid var(--ink); display: grid; place-items: center; font-size: .85rem; }
+.os { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+.os div { border: 1px solid var(--line); border-radius: 8px; padding: .8rem 1rem; }
+.os p { margin: .2rem 0; font-size: .95rem; }
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: 1fr; }
+  .menu-btn { display: inline-block; }
+  nav.lessons {
+    display: none; position: fixed; top: 54px; left: 0; right: 0; bottom: 0; max-height: none;
+    background: var(--surface); z-index: 15; border-bottom: 2px solid var(--ink);
+  }
+  nav.lessons.open { display: block; }
+  main { padding: 1rem .75rem 4rem; }
+  article { padding: 1.4rem 1.1rem 2rem; }
+  .bar { width: 70px; }
+  .brand span { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .caret { animation: none; }
+  .bar i { transition: none; }
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#/"><b>C</b><span>Steps</span></a>
+  <button class="menu-btn" id="menuBtn" aria-expanded="false" aria-controls="lessonNav">Lessons</button>
+  <div class="progress" aria-live="polite">
+    <span id="progText">0 of 12 done</span>
+    <div class="bar" aria-hidden="true"><i id="progBar"></i></div>
+  </div>
+</header>
+
+<div class="layout">
+  <nav class="lessons" id="lessonNav" aria-label="Lessons"></nav>
+  <main id="main"></main>
+</div>
+
+<script>
+const LESSONS = [
+{
+  title: "Your first program",
+  summary: "What a C program looks like and how to run one.",
+  body: [
+    "C is a small, fast language. Operating systems, microcontrollers and many other languages are written in it. Learning C teaches you how a computer actually stores and moves data.",
+    "Every C program starts running in a function called <code>main</code>. The line <code>#include &lt;stdio.h&gt;</code> brings in the standard input/output library, which gives you <code>printf</code> for printing text.",
+    "<code>\\n</code> inside a string means \"start a new line\". <code>return 0;</code> tells the system the program finished without errors. Every statement ends with a semicolon.",
+    "To run it, save the code as <code>hello.c</code>, then compile and run it:<pre class=\"cmd\">gcc hello.c -o hello\n./hello</pre>On Windows, the second line is <code>hello.exe</code>."
+  ],
+  code: String.raw`#include <stdio.h>
+
+int main(void) {
+    printf("Hello, world!\n");
+    printf("I am learning C.\n");
+    return 0;
+}`,
+  output: "Hello, world!\nI am learning C.",
+  mistake: "Forgetting the semicolon at the end of a statement. The compiler usually reports the error on the <em>next</em> line, so check the line above the one it points to.",
+  predict: {
+    full: true,
+    code: String.raw`#include <stdio.h>
+
+int main(void) {
+    printf("One ");
+    printf("Two\n");
+    printf("Three\n");
+    return 0;
+}`,
+    options: ["One\nTwo\nThree", "One Two\nThree", "One Two Three"],
+    answer: 1,
+    why: "The first printf has no \\n, so \"Two\" is printed on the same line. Only a \\n moves to the next line."
+  },
+  quiz: [
+    { q: "Which line lets you use printf?", options: ["#include <stdio.h>", "int main(void)", "return 0;"], answer: 0, why: "printf is declared in stdio.h, so you need to include it first." },
+    { q: "Where does a C program start running?", options: ["At the first line of the file", "Inside the main function", "Inside the last function in the file"], answer: 1, why: "The system always calls main first, wherever it sits in the file." }
+  ],
+  practice: {
+    task: "Write a program that prints your name on the first line and your city on the second line.",
+    hint: "Use two printf calls, each ending with \\n.",
+    solution: String.raw`#include <stdio.h>
+
+int main(void) {
+    printf("Priya\n");
+    printf("Chennai\n");
+    return 0;
+}`,
+    output: "Priya\nChennai"
+  }
+},
+{
+  title: "Variables and data types",
+  summary: "Storing numbers and letters, and printing them.",
+  body: [
+    "A variable is a named spot in memory that holds a value. In C you must say what type of value it holds before you use it.",
+    "<ul><li><code>int</code> holds whole numbers like 42 or -7.</li><li><code>float</code> holds decimal numbers with about 6 digits of accuracy.</li><li><code>double</code> holds decimal numbers with about 15 digits of accuracy.</li><li><code>char</code> holds one character, written in single quotes like <code>'A'</code>.</li></ul>",
+    "To print a variable, put a format specifier in the printf string: <code>%d</code> for int, <code>%f</code> for float or double, <code>%c</code> for char. <code>%.2f</code> prints two digits after the decimal point.",
+    "<code>sizeof</code> tells you how many bytes a type uses. On most computers today an <code>int</code> is 4 bytes."
+  ],
+  code: String.raw`#include <stdio.h>
+
+int main(void) {
+    int age = 19;
+    float height = 5.6f;
+    double pi = 3.14159265;
+    char grade = 'A';
+
+    printf("Age: %d\n", age);
+    printf("Height: %.1f feet\n", height);
+    printf("Pi: %.4f\n", pi);
+    printf("Grade: %c\n", grade);
+    printf("An int uses %zu bytes\n", sizeof(int));
+    return 0;
+}`,
+  output: "Age: 19\nHeight: 5.6 feet\nPi: 3.1416\nGrade: A\nAn int uses 4 bytes",
+  mistake: "Printing a float with <code>%d</code>. The compiler may only warn you, and the program prints a wrong number. Always match the specifier to the type.",
+  predict: {
+    code: String.raw`int a = 10;
+int b = a;
+a = 25;
+printf("%d %d\n", a, b);`,
+    options: ["25 25", "25 10", "10 25"],
+    answer: 1,
+    why: "b = a copies the value 10 into b. Changing a later does not touch b."
+  },
+  quiz: [
+    { q: "Which type should hold the letter 'Q'?", options: ["int", "char", "float"], answer: 1, why: "char holds a single character." },
+    { q: "What does printf(\"%.2f\", 3.14159) print?", options: ["3.14159", "3.1", "3.14"], answer: 2, why: "%.2f keeps two digits after the decimal point and rounds." }
+  ],
+  practice: {
+    task: "A rectangle is 7.5 units long and 4 units wide. Store both in variables, calculate the area, and print it with two decimal places.",
+    hint: "Use float for all three values and %.2f to print.",
+    solution: String.raw`#include <stdio.h>
+
+int main(void) {
+    float length = 7.5f;
+    float width = 4.0f;
+    float area = length * width;
+    printf("Area: %.2f\n", area);
+    return 0;
+}`,
+    output: "Area: 30.00"
+  }
+},
+{
+  title: "Reading input with scanf",
+  summary: "Getting numbers from the keyboard.",
+  body: [
+    "<code>scanf</code> reads what the user types and stores it in your variables. It uses the same kind of format specifiers as printf.",
+    "Put <code>&amp;</code> before each variable name. <code>&amp;a</code> means \"the address of a\". scanf needs the address so it knows where in memory to put the value. You will learn more about addresses in the pointers lesson.",
+    "One difference from printf: to read a <code>double</code> you must use <code>%lf</code>. For float use <code>%f</code>, for int use <code>%d</code>."
+  ],
+  code: String.raw`#include <stdio.h>
+
+int main(void) {
+    int a, b;
+    printf("Enter two numbers: ");
+    scanf("%d %d", &a, &b);
+    printf("Sum = %d\n", a + b);
+    return 0;
+}`,
+  input: "5 7",
+  output: "Enter two numbers: 5 7\nSum = 12",
+  outputLabel: "Output when you type 5 7",
+  mistake: "Leaving out the <code>&amp;</code>, as in <code>scanf(\"%d\", a)</code>. The program may crash or store the number somewhere random.",
+  predict: {
+    code: String.raw`int n;
+scanf("%d", &n);
+printf("%d squared is %d\n", n, n * n);`,
+    input: "4",
+    question: "The user types 4. What prints?",
+    options: ["4 squared is 16", "n squared is n * n", "16 squared is 4"],
+    answer: 0,
+    why: "Each %d is replaced by the next value in the list: first n (4), then n * n (16)."
+  },
+  quiz: [
+    { q: "Why does scanf need & before the variable?", options: ["It makes the number positive", "It gives scanf the variable's address so it can store the value there", "It is optional and only for style"], answer: 1, why: "scanf writes into memory, so it needs to know where the variable lives." },
+    { q: "Which specifier reads a double with scanf?", options: ["%f", "%lf", "%d"], answer: 1, why: "scanf uses %lf for double. %f is for float." }
+  ],
+  practice: {
+    task: "Read a temperature in Celsius and print it in Fahrenheit. The formula is F = C × 9 / 5 + 32.",
+    hint: "Use float, not int. With two ints, 9 / 5 gives 1.",
+    solution: String.raw`#include <stdio.h>
+
+int main(void) {
+    float c;
+    printf("Temperature in Celsius: ");
+    scanf("%f", &c);
+    float f = c * 9 / 5 + 32;
+    printf("That is %.2f Fahrenheit\n", f);
+    return 0;
+}`,
+    input: "37",
+    output: "Temperature in Celsius: 37\nThat is 98.60 Fahrenheit"
+  }
+},
+{
+  title: "Operators",
+  summary: "Maths, comparisons and logic.",
+  body: [
+    "The arithmetic operators are <code>+ - * /</code> and <code>%</code>. The <code>%</code> operator gives the remainder of a division and only works with whole numbers.",
+    "When both numbers are ints, <code>/</code> throws away the decimal part. <code>17 / 5</code> is 3, not 3.4. Make one of them a decimal, like <code>17.0 / 5</code>, to get 3.4.",
+    "Comparisons (<code>== != &lt; &gt; &lt;= &gt;=</code>) give 1 for true and 0 for false. You can join them with <code>&amp;&amp;</code> (and), <code>||</code> (or) and <code>!</code> (not).",
+    "<code>x++</code> adds 1 to x. <code>x += 5</code> is short for <code>x = x + 5</code>. To print a percent sign with printf, write <code>%%</code>."
+  ],
+  code: String.raw`#include <stdio.h>
+
+int main(void) {
+    int a = 17, b = 5;
+    printf("a + b = %d\n", a + b);
+    printf("a - b = %d\n", a - b);
+    printf("a * b = %d\n", a * b);
+    printf("a / b = %d\n", a / b);
+    printf("a %% b = %d\n", a % b);
+    printf("17.0 / 5 = %.1f\n", 17.0 / 5);
+    return 0;
+}`,
+  output: "a + b = 22\na - b = 12\na * b = 85\na / b = 3\na % b = 2\n17.0 / 5 = 3.4",
+  mistake: "Writing <code>float half = 1 / 2;</code> and getting 0. The division happens with ints first, then the result is stored. Write <code>1.0 / 2</code>.",
+  predict: {
+    code: String.raw`int i = 5;
+int j = i++;
+int k = ++i;
+printf("%d %d %d\n", i, j, k);`,
+    options: ["7 5 7", "6 6 7", "7 6 7"],
+    answer: 0,
+    why: "i++ hands back the old value (5) and then adds 1, so j is 5 and i is 6. ++i adds 1 first, so i becomes 7 and k is 7."
+  },
+  quiz: [
+    { q: "With int variables, what is 9 / 2?", options: ["4.5", "4", "5"], answer: 1, why: "Integer division drops the decimal part." },
+    { q: "What is the value of (5 > 3 && 2 > 4)?", options: ["1", "0", "5"], answer: 1, why: "2 > 4 is false, and && needs both sides true." }
+  ],
+  practice: {
+    task: "Read a number of seconds and print it as minutes and seconds. For 135 the program should print \"2 minutes and 15 seconds\".",
+    hint: "Division by 60 gives minutes. The remainder (%) gives the leftover seconds.",
+    solution: String.raw`#include <stdio.h>
+
+int main(void) {
+    int total;
+    printf("Seconds: ");
+    scanf("%d", &total);
+    int minutes = total / 60;
+    int seconds = total % 60;
+    printf("%d minutes and %d seconds\n", minutes, seconds);
+    return 0;
+}`,
+    input: "135",
+    output: "Seconds: 135\n2 minutes and 15 seconds"
+  }
+},
+{
+  title: "Making decisions",
+  summary: "if, else and switch.",
+  body: [
+    "<code>if</code> runs a block of code only when its condition is true. Add <code>else if</code> and <code>else</code> to handle other cases. C checks the conditions from top to bottom and runs only the first block whose condition is true.",
+    "<code>switch</code> compares one value against a list of fixed cases. End each case with <code>break</code>, or the program keeps going into the next case. <code>default</code> runs when no case matches."
+  ],
+  code: String.raw`#include <stdio.h>
+
+int main(void) {
+    int marks = 72;
+
+    if (marks >= 90) {
+        printf("Grade A\n");
+    } else if (marks >= 75) {
+        printf("Grade B\n");
+    } else if (marks >= 50) {
+        printf("Grade C\n");
+    } else {
+        printf("Fail\n");
+    }
+
+    int day = 3;
+    switch (day) {
+        case 1: printf("Monday\n"); break;
+        case 2: printf("Tuesday\n"); break;
+        case 3: printf("Wednesday\n"); break;
+        default: printf("Another day\n");
+    }
+    return 0;
+}`,
+  output: "Grade C\nWednesday",
+  mistake: "Writing <code>if (x = 5)</code> instead of <code>if (x == 5)</code>. A single <code>=</code> stores 5 in x, and since 5 is not zero, the condition is always true.",
+  predict: {
+    code: String.raw`int n = 2;
+switch (n) {
+    case 1: printf("one ");
+    case 2: printf("two ");
+    case 3: printf("three ");
+}
+printf("\n");`,
+    options: ["two", "two three", "one two three"],
+    answer: 1,
+    why: "There are no break statements, so after case 2 matches, the program falls through and runs case 3 too."
+  },
+  quiz: [
+    { q: "When does the block in if (x = 0) { ... } run?", options: ["Always", "Never", "Only when x is 0"], answer: 1, why: "x = 0 stores 0, and 0 counts as false, so the block never runs." },
+    { q: "In an if / else if / else chain, how many blocks can run?", options: ["All the true ones", "At most one", "Exactly two"], answer: 1, why: "C stops at the first true condition and skips the rest." }
+  ],
+  practice: {
+    task: "Read three numbers and print the largest one.",
+    hint: "Start by assuming the first number is the largest, then compare the other two against it.",
+    solution: String.raw`#include <stdio.h>
+
+int main(void) {
+    int a, b, c;
+    printf("Enter three numbers: ");
+    scanf("%d %d %d", &a, &b, &c);
+
+    int largest = a;
+    if (b > largest) largest = b;
+    if (c > largest) largest = c;
+
+    printf("Largest: %d\n", largest);
+    return 0;
+}`,
+    input: "4 9 2",
+    output: "Enter three numbers: 4 9 2\nLargest: 9"
+  }
+},
+{
+  title: "Loops",
+  summary: "Repeating code with for, while and do-while.",
+  body: [
+    "A <code>for</code> loop is best when you know how many times to repeat. Its header has three parts: a starting value, a condition to keep going, and a step.",
+    "A <code>while</code> loop checks its condition before each round and stops when the condition becomes false. A <code>do-while</code> loop checks at the end, so its body always runs at least once.",
+    "<code>break</code> leaves a loop right away. <code>continue</code> skips to the next round."
+  ],
+  code: String.raw`#include <stdio.h>
+
+int main(void) {
+    for (int i = 1; i <= 5; i++) {
+        printf("%d ", i);
+    }
+    printf("\n");
+
+    int n = 10, sum = 0, k = 1;
+    while (k <= n) {
+        sum += k;
+        k++;
+    }
+    printf("Sum of 1 to %d = %d\n", n, sum);
+
+    int tries = 0;
+    do {
+        tries++;
+    } while (tries < 3);
+    printf("Tried %d times\n", tries);
+    return 0;
+}`,
+  output: "1 2 3 4 5\nSum of 1 to 10 = 55\nTried 3 times",
+  mistake: "Putting a semicolon after the loop header: <code>for (i = 0; i &lt; 5; i++);</code>. The semicolon becomes the whole loop body, and the block below runs only once.",
+  predict: {
+    code: String.raw`for (int i = 0; i < 10; i += 3) {
+    printf("%d ", i);
+}
+printf("\n");`,
+    options: ["0 3 6 9", "3 6 9", "0 3 6 9 12"],
+    answer: 0,
+    why: "i takes the values 0, 3, 6 and 9. The next value, 12, fails i < 10, so the loop stops."
+  },
+  quiz: [
+    { q: "How many times does for (i = 0; i < 5; i++) run?", options: ["4", "5", "6"], answer: 1, why: "i goes 0, 1, 2, 3, 4. That is five rounds." },
+    { q: "Which loop always runs its body at least once?", options: ["for", "while", "do-while"], answer: 2, why: "do-while checks its condition after the body." }
+  ],
+  practice: {
+    task: "Read a number and print its multiplication table from 1 to 10.",
+    hint: "Use a for loop from 1 to 10 and print n, i and n * i on each line.",
+    solution: String.raw`#include <stdio.h>
+
+int main(void) {
+    int n;
+    printf("Table of: ");
+    scanf("%d", &n);
+    for (int i = 1; i <= 10; i++) {
+        printf("%d x %d = %d\n", n, i, n * i);
+    }
+    return 0;
+}`,
+    input: "7",
+    output: "Table of: 7\n7 x 1 = 7\n7 x 2 = 14\n7 x 3 = 21\n7 x 4 = 28\n7 x 5 = 35\n7 x 6 = 42\n7 x 7 = 49\n7 x 8 = 56\n7 x 9 = 63\n7 x 10 = 70"
+  }
+},
+{
+  title: "Functions",
+  summary: "Splitting a program into small named pieces.",
+  body: [
+    "A function is a named block of code that does one job. You write it once and call it as many times as you need.",
+    "The first line of a function gives its return type, its name and its parameters, as in <code>int square(int x)</code>. Use <code>void</code> as the return type when the function returns nothing.",
+    "If you call a function before its full code appears in the file, put a declaration (also called a prototype) near the top so the compiler knows it exists.",
+    "C passes arguments by value. The function gets a copy, so changing a parameter inside the function does not change the caller's variable."
+  ],
+  code: String.raw`#include <stdio.h>
+
+int square(int x);          /* declaration */
+
+int main(void) {
+    int n = 6;
+    printf("%d squared is %d\n", n, square(n));
+    printf("3 squared is %d\n", square(3));
+    return 0;
+}
+
+int square(int x) {         /* definition */
+    return x * x;
+}`,
+  output: "6 squared is 36\n3 squared is 9",
+  mistake: "Expecting a function to change a variable you passed in. It only changes its own copy. The pointers lesson shows how to change the original.",
+  predict: {
+    full: true,
+    code: String.raw`#include <stdio.h>
+
+void addTen(int x) {
+    x = x + 10;
+}
+
+int main(void) {
+    int a = 5;
+    addTen(a);
+    printf("%d\n", a);
+    return 0;
+}`,
+    options: ["5", "15", "10"],
+    answer: 0,
+    why: "addTen gets a copy of a. It adds 10 to the copy, and the copy is thrown away when the function ends."
+  },
+  quiz: [
+    { q: "What return type does a function that returns nothing use?", options: ["int", "void", "null"], answer: 1, why: "void means the function does not return a value." },
+    { q: "What is the line int max(int a, int b); called?", options: ["A declaration (prototype)", "A function call", "A loop"], answer: 0, why: "It tells the compiler the function's name, parameters and return type. The body comes elsewhere." }
+  ],
+  practice: {
+    task: "Write a function int isPrime(int n) that returns 1 if n is prime and 0 if not. Use it to print every prime number up to 30.",
+    hint: "A number is prime if it is at least 2 and no number from 2 up to its square root divides it evenly. Check n % i == 0.",
+    solution: String.raw`#include <stdio.h>
+
+int isPrime(int n) {
+    if (n < 2) return 0;
+    for (int i = 2; i * i <= n; i++) {
+        if (n % i == 0) return 0;
+    }
+    return 1;
+}
+
+int main(void) {
+    for (int n = 1; n <= 30; n++) {
+        if (isPrime(n)) printf("%d ", n);
+    }
+    printf("\n");
+    return 0;
+}`,
+    output: "2 3 5 7 11 13 17 19 23 29"
+  }
+},
+{
+  title: "Arrays",
+  summary: "Keeping many values of the same type together.",
+  body: [
+    "An array stores several values of the same type side by side in memory. <code>int marks[5];</code> makes room for five ints.",
+    "Each value has an index, and the first index is 0. In an array of size 5, the valid indexes are 0 to 4.",
+    "C does not check whether an index is inside the array. Reading or writing past the end gives wrong results or crashes, with no error message to warn you.",
+    "If you list fewer values than the size, as in <code>int a[5] = {1, 2};</code>, the rest are set to 0."
+  ],
+  code: String.raw`#include <stdio.h>
+
+int main(void) {
+    int marks[5] = {78, 91, 64, 85, 70};
+    int total = 0;
+
+    for (int i = 0; i < 5; i++) {
+        total += marks[i];
+    }
+
+    printf("First mark: %d\n", marks[0]);
+    printf("Last mark: %d\n", marks[4]);
+    printf("Average: %.1f\n", total / 5.0);
+    return 0;
+}`,
+  output: "First mark: 78\nLast mark: 70\nAverage: 77.6",
+  mistake: "Looping with <code>i &lt;= 5</code> over an array of size 5. The last round reads <code>marks[5]</code>, which is outside the array.",
+  predict: {
+    code: String.raw`int nums[4] = {2, 4, 6, 8};
+nums[1] = nums[0] + nums[3];
+printf("%d %d\n", nums[1], nums[2]);`,
+    options: ["10 6", "6 4", "10 4"],
+    answer: 0,
+    why: "nums[0] is 2 and nums[3] is 8, so nums[1] becomes 10. nums[2] was never changed and is still 6."
+  },
+  quiz: [
+    { q: "An array has size 10. What is its last valid index?", options: ["10", "9", "11"], answer: 1, why: "Indexes start at 0, so they run from 0 to 9." },
+    { q: "After int a[5] = {1, 2};, what is a[3]?", options: ["0", "2", "A random value"], answer: 0, why: "Missing values in an initializer list are set to 0." }
+  ],
+  practice: {
+    task: "Given the array {12, 45, 7, 89, 23, 56}, find the largest value and the index where it sits.",
+    hint: "Keep track of the index of the largest value seen so far, starting at 0.",
+    solution: String.raw`#include <stdio.h>
+
+int main(void) {
+    int nums[6] = {12, 45, 7, 89, 23, 56};
+    int maxIndex = 0;
+
+    for (int i = 1; i < 6; i++) {
+        if (nums[i] > nums[maxIndex]) {
+            maxIndex = i;
+        }
+    }
+
+    printf("Largest: %d at index %d\n", nums[maxIndex], maxIndex);
+    return 0;
+}`,
+    output: "Largest: 89 at index 3"
+  }
+},
+{
+  title: "Strings",
+  summary: "Text as arrays of characters.",
+  body: [
+    "C has no separate string type. A string is a <code>char</code> array that ends with the special character <code>'\\0'</code>, which marks where the text stops. The word \"cat\" needs 4 slots: c, a, t and <code>'\\0'</code>.",
+    "Print a string with <code>%s</code>. The header <code>&lt;string.h&gt;</code> gives you useful functions: <code>strlen</code> counts characters, <code>strcpy</code> copies, <code>strcat</code> joins, and <code>strcmp</code> compares.",
+    "<code>scanf(\"%s\", word)</code> reads one word, with no <code>&amp;</code> because an array name already acts as an address. It stops at the first space. To read a full line with spaces, use <code>fgets(line, sizeof(line), stdin)</code>."
+  ],
+  code: String.raw`#include <stdio.h>
+#include <string.h>
+
+int main(void) {
+    char word[20] = "Hello";
+    char copy[20];
+
+    printf("Word: %s\n", word);
+    printf("Length: %zu\n", strlen(word));
+
+    strcpy(copy, word);
+    strcat(copy, " there");
+    printf("Copy: %s\n", copy);
+
+    if (strcmp(word, "Hello") == 0) {
+        printf("The words match\n");
+    }
+    return 0;
+}`,
+  output: "Word: Hello\nLength: 5\nCopy: Hello there\nThe words match",
+  mistake: "Comparing strings with <code>==</code>. That compares memory addresses, not the text. Use <code>strcmp(a, b) == 0</code>.",
+  predict: {
+    code: String.raw`char s[] = "code";
+printf("%zu %zu\n", strlen(s), sizeof(s));`,
+    options: ["4 4", "4 5", "5 5"],
+    answer: 1,
+    why: "strlen counts the four letters. sizeof counts the whole array, which includes the '\\0' at the end."
+  },
+  quiz: [
+    { q: "How many chars does an array need to hold \"cat\"?", options: ["3", "4", "5"], answer: 1, why: "Three letters plus the '\\0' that ends the string." },
+    { q: "What does strcmp return when two strings are equal?", options: ["1", "0", "-1"], answer: 1, why: "strcmp returns 0 for a match, and a positive or negative number otherwise." }
+  ],
+  practice: {
+    task: "Read a word and count how many vowels it has. Count both lowercase and uppercase vowels.",
+    hint: "Loop until you reach '\\0', and check each character against the ten vowel letters.",
+    solution: String.raw`#include <stdio.h>
+
+int main(void) {
+    char word[50];
+    int count = 0;
+
+    printf("Enter a word: ");
+    scanf("%49s", word);
+
+    for (int i = 0; word[i] != '\0'; i++) {
+        char c = word[i];
+        if (c == 'a' || c == 'e' || c == 'i' || c == 'o' || c == 'u' ||
+            c == 'A' || c == 'E' || c == 'I' || c == 'O' || c == 'U') {
+            count++;
+        }
+    }
+
+    printf("Vowels: %d\n", count);
+    return 0;
+}`,
+    input: "programming",
+    output: "Enter a word: programming\nVowels: 3"
+  }
+},
+{
+  title: "Pointers",
+  summary: "Variables that hold memory addresses.",
+  body: [
+    "Every variable lives at an address in memory. <code>&amp;x</code> gives you the address of x.",
+    "A pointer is a variable that stores an address. <code>int *p = &amp;x;</code> makes p point to x. Writing <code>*p</code> reads or changes the value stored at that address, so <code>*p = 20;</code> changes x.",
+    "Pointers solve the problem from the functions lesson. If you pass a variable's address, the function can change the original. This is why scanf needs <code>&amp;</code>.",
+    "An array name works like a pointer to its first element. A pointer that points nowhere should be set to <code>NULL</code>."
+  ],
+  code: String.raw`#include <stdio.h>
+
+void swap(int *a, int *b) {
+    int temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+int main(void) {
+    int x = 10;
+    int *p = &x;
+
+    printf("x = %d\n", x);
+    printf("*p = %d\n", *p);
+
+    *p = 20;
+    printf("x is now %d\n", x);
+
+    int m = 1, n = 2;
+    swap(&m, &n);
+    printf("m = %d, n = %d\n", m, n);
+    return 0;
+}`,
+  output: "x = 10\n*p = 10\nx is now 20\nm = 2, n = 1",
+  mistake: "Using a pointer before giving it an address: <code>int *p; *p = 5;</code>. p holds a random address, so this writes somewhere unknown and can crash the program.",
+  predict: {
+    code: String.raw`int a = 3, b = 8;
+int *p = &a;
+*p = *p + b;
+p = &b;
+*p = 0;
+printf("%d %d\n", a, b);`,
+    options: ["11 0", "3 0", "11 8"],
+    answer: 0,
+    why: "While p points to a, *p = *p + b makes a equal to 11. Then p moves to b, and *p = 0 sets b to 0."
+  },
+  quiz: [
+    { q: "If p points to x, what is *p?", options: ["The address of x", "The value stored in x", "The address of p"], answer: 1, why: "* follows the pointer to the value it points at." },
+    { q: "What does &x give you?", options: ["The value of x", "The address of x", "x plus one"], answer: 1, why: "& is the address-of operator." }
+  ],
+  practice: {
+    task: "Write void minMax(int arr[], int size, int *min, int *max) that finds the smallest and largest values in an array and sends both back through the pointers. Test it with {34, 7, 82, 15, 60}.",
+    hint: "Start both *min and *max at arr[0], then compare each other element.",
+    solution: String.raw`#include <stdio.h>
+
+void minMax(int arr[], int size, int *min, int *max) {
+    *min = arr[0];
+    *max = arr[0];
+    for (int i = 1; i < size; i++) {
+        if (arr[i] < *min) *min = arr[i];
+        if (arr[i] > *max) *max = arr[i];
+    }
+}
+
+int main(void) {
+    int data[5] = {34, 7, 82, 15, 60};
+    int lo, hi;
+    minMax(data, 5, &lo, &hi);
+    printf("Min: %d, Max: %d\n", lo, hi);
+    return 0;
+}`,
+    output: "Min: 7, Max: 82"
+  }
+},
+{
+  title: "Structures",
+  summary: "Grouping related data of different types.",
+  body: [
+    "A <code>struct</code> bundles several variables into one unit. A student has a name, a roll number and marks, and a struct lets you keep them together.",
+    "Reach a member with a dot, as in <code>s1.roll</code>. If you have a pointer to a struct, use an arrow instead: <code>p-&gt;roll</code>.",
+    "<code>typedef</code> gives a struct a shorter name, so you can write <code>Book b;</code> instead of <code>struct Book b;</code>. You can also make arrays of structs."
+  ],
+  code: String.raw`#include <stdio.h>
+#include <string.h>
+
+struct Student {
+    char name[30];
+    int roll;
+    float marks;
+};
+
+int main(void) {
+    struct Student s1;
+    strcpy(s1.name, "Meera");
+    s1.roll = 12;
+    s1.marks = 88.5f;
+
+    struct Student s2 = {"Arjun", 7, 91.0f};
+
+    printf("%s (roll %d): %.1f\n", s1.name, s1.roll, s1.marks);
+    printf("%s (roll %d): %.1f\n", s2.name, s2.roll, s2.marks);
+
+    struct Student *p = &s2;
+    p->marks = 93.5f;
+    printf("%s now has %.1f\n", p->name, s2.marks);
+    return 0;
+}`,
+  output: "Meera (roll 12): 88.5\nArjun (roll 7): 91.0\nArjun now has 93.5",
+  mistake: "Writing <code>s1.name = \"Meera\";</code>. You cannot assign to an array with <code>=</code>. Use <code>strcpy</code>, or set the value when you create the struct.",
+  predict: {
+    code: String.raw`struct Point { int x; int y; };
+struct Point a = {2, 3};
+struct Point b = a;
+b.x = 10;
+printf("%d %d\n", a.x, b.x);`,
+    options: ["10 10", "2 10", "2 2"],
+    answer: 1,
+    why: "b = a copies every field into b. After that, a and b are separate, so changing b.x leaves a.x at 2."
+  },
+  quiz: [
+    { q: "Which operator reaches a member through a pointer?", options: [".", "->", "*"], answer: 1, why: "p->roll is short for (*p).roll." },
+    { q: "Can one struct hold an int, a float and a char array?", options: ["Yes", "No, all members must share a type"], answer: 0, why: "Mixing types is the main reason to use a struct." }
+  ],
+  practice: {
+    task: "Store three books, each with a title and a price, in an array of structs. Print the most expensive one. Use \"C Basics\" 250, \"Data Structures\" 420 and \"Algorithms\" 380.",
+    hint: "Use typedef to name the struct Book, then track the index of the highest price.",
+    solution: String.raw`#include <stdio.h>
+
+typedef struct {
+    char title[40];
+    float price;
+} Book;
+
+int main(void) {
+    Book shelf[3] = {
+        {"C Basics", 250.0f},
+        {"Data Structures", 420.0f},
+        {"Algorithms", 380.0f}
+    };
+
+    int best = 0;
+    for (int i = 1; i < 3; i++) {
+        if (shelf[i].price > shelf[best].price) {
+            best = i;
+        }
+    }
+
+    printf("Most expensive: %s (%.2f)\n", shelf[best].title, shelf[best].price);
+    return 0;
+}`,
+    output: "Most expensive: Data Structures (420.00)"
+  }
+},
+{
+  title: "Working with files",
+  summary: "Saving data and reading it back.",
+  body: [
+    "A file is opened with <code>fopen</code>, which returns a <code>FILE *</code>. The second argument is the mode: <code>\"r\"</code> reads, <code>\"w\"</code> writes and erases anything already in the file, and <code>\"a\"</code> adds to the end.",
+    "<code>fopen</code> returns <code>NULL</code> if it fails, for example when the file does not exist. Always check for that before using the file.",
+    "<code>fprintf</code> writes to a file the way printf writes to the screen. <code>fgets</code> reads a line, and <code>fscanf</code> reads formatted values. Call <code>fclose</code> when you are done so the data is saved."
+  ],
+  code: String.raw`#include <stdio.h>
+
+int main(void) {
+    FILE *fp = fopen("notes.txt", "w");
+    if (fp == NULL) {
+        printf("Could not open file\n");
+        return 1;
+    }
+    fprintf(fp, "Line one\n");
+    fprintf(fp, "Line two\n");
+    fclose(fp);
+
+    fp = fopen("notes.txt", "r");
+    if (fp == NULL) {
+        printf("Could not open file\n");
+        return 1;
+    }
+
+    char line[100];
+    while (fgets(line, sizeof(line), fp) != NULL) {
+        printf("Read: %s", line);
+    }
+    fclose(fp);
+    return 0;
+}`,
+  output: "Read: Line one\nRead: Line two",
+  mistake: "Opening a file with <code>\"w\"</code> when you meant <code>\"a\"</code>. Mode <code>\"w\"</code> empties the file the moment it opens.",
+  predict: {
+    code: String.raw`FILE *fp = fopen("log.txt", "w");
+fprintf(fp, "A\n");
+fclose(fp);
+
+fp = fopen("log.txt", "a");
+fprintf(fp, "B\n");
+fclose(fp);
+
+fp = fopen("log.txt", "w");
+fprintf(fp, "C\n");
+fclose(fp);`,
+    test: "log.txt",
+    question: "What is inside log.txt at the end?",
+    options: ["A\nB\nC", "C", "B\nC"],
+    answer: 1,
+    why: "The file holds A, then A and B. The last fopen uses \"w\", which erases everything before C is written."
+  },
+  quiz: [
+    { q: "Which mode adds new text to the end of a file?", options: ["\"r\"", "\"w\"", "\"a\""], answer: 2, why: "\"a\" stands for append." },
+    { q: "What does fopen return when it cannot open a file?", options: ["0 bytes", "NULL", "An empty string"], answer: 1, why: "Check for NULL before reading or writing." }
+  ],
+  practice: {
+    task: "Write the squares of 1 to 5 into a file, one per line. Then open the file again, read the numbers back and print their sum.",
+    hint: "Use fprintf in the first loop. In the second loop, keep reading while fscanf(fp, \"%d\", &value) returns 1.",
+    solution: String.raw`#include <stdio.h>
+
+int main(void) {
+    FILE *fp = fopen("squares.txt", "w");
+    if (fp == NULL) return 1;
+    for (int i = 1; i <= 5; i++) {
+        fprintf(fp, "%d\n", i * i);
+    }
+    fclose(fp);
+
+    fp = fopen("squares.txt", "r");
+    if (fp == NULL) return 1;
+    int value, sum = 0;
+    while (fscanf(fp, "%d", &value) == 1) {
+        sum += value;
+    }
+    fclose(fp);
+
+    printf("Sum: %d\n", sum);
+    return 0;
+}`,
+    output: "Sum: 55"
+  }
+}
+];
+if (typeof module !== "undefined") module.exports = LESSONS;
+
+</script>
+<script>
+(function () {
+  var KEY = "csteps-done";
+  var done = [];
+  try { done = JSON.parse(localStorage.getItem(KEY) || "[]") || []; } catch (e) { done = []; }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(done)); } catch (e) {} }
+  function isDone(i) { return done.indexOf(i) !== -1; }
+
+  var main = document.getElementById("main");
+  var nav = document.getElementById("lessonNav");
+  var menuBtn = document.getElementById("menuBtn");
+  var heroTimer = null;
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  var KW = {};
+  ("int float double char void return if else for while do switch case break continue default " +
+   "struct typedef const unsigned long short sizeof static NULL FILE size_t").split(" ").forEach(function (k) { KW[k] = 1; });
+
+  function highlight(src) {
+    var re = /(\/\*[\s\S]*?\*\/|\/\/[^\n]*)|("(?:\\.|[^"\\\n])*"|'(?:\\.|[^'\\\n])*')|(^[ \t]*#[^\n]*)|(\b\d+(?:\.\d+)?f?\b)|([A-Za-z_]\w*)(?=\s*\()|([A-Za-z_]\w*)/gm;
+    var out = "", last = 0, m;
+    function span(c, t) { return '<span class="tk-' + c + '">' + esc(t) + "</span>"; }
+    while ((m = re.exec(src))) {
+      out += esc(src.slice(last, m.index));
+      var t = m[0];
+      if (m[1]) out += span("com", t);
+      else if (m[2]) out += span("str", t);
+      else if (m[3]) out += span("pre", t);
+      else if (m[4]) out += span("num", t);
+      else if (m[5]) out += KW[t] ? span("kw", t) : span("fn", t);
+      else out += KW[t] ? span("kw", t) : esc(t);
+      last = re.lastIndex;
+    }
+    return out + esc(src.slice(last));
+  }
+
+  var codeStore = [];
+  function codeBlock(src, withOutput) {
+    var id = codeStore.push(src) - 1;
+    return '<div class="code' + (withOutput ? " has-output" : "") + '">' +
+      '<button class="copy" data-copy="' + id + '">Copy</button>' +
+      "<pre><code>" + highlight(src) + "</code></pre></div>";
+  }
+  function outputBlock(text, label) {
+    return '<div class="output"><span class="label">' + esc(label || "Output") + "</span><pre>" + esc(text) + "</pre></div>";
+  }
+
+  function renderNav(current) {
+    var h = '<ol><li><a class="home-link" href="#/"' + (current === -1 ? ' aria-current="page"' : "") + ">Start here</a></li>";
+    LESSONS.forEach(function (l, i) {
+      h += '<li><a href="#/lesson/' + (i + 1) + '"' + (i === current ? ' aria-current="page"' : "") + ">" +
+        '<span class="num">' + String(i + 1).padStart(2, "0") + "</span>" +
+        "<span>" + esc(l.title) + "</span>" +
+        '<span class="tick">' + (isDone(i) ? '✓<span class="sr" style="position:absolute;left:-9999px"> done</span>' : "") + "</span></a></li>";
+    });
+    nav.innerHTML = "<h2>12 lessons</h2>" + h + "</ol>";
+    var n = done.length;
+    document.getElementById("progText").textContent = n + " of " + LESSONS.length + " done";
+    document.getElementById("progBar").style.width = (n / LESSONS.length * 100) + "%";
+  }
+
+  function choicesHtml(options, group, mono) {
+    return '<div class="choices">' + options.map(function (o, k) {
+      return '<button class="choice" data-group="' + group + '" data-k="' + k + '"' + (mono ? "" : ' style="font-family:var(--sans)"') + ">" + esc(o) + "</button>";
+    }).join("") + '</div><div class="fb" id="fb-' + group + '"></div>';
+  }
+
+  var answers = {};
+
+  function renderLesson(i) {
+    var l = LESSONS[i];
+    codeStore = []; answers = {};
+    var h = "<article>";
+    h += '<p class="crumb">Lesson ' + (i + 1) + " of " + LESSONS.length + "</p>";
+    h += "<h1>" + esc(l.title) + "</h1>";
+    h += '<p class="lede">' + esc(l.summary) + "</p>";
+    l.body.forEach(function (b) { h += b.indexOf("<ul>") === 0 ? b : "<p>" + b + "</p>"; });
+
+    h += "<h2>Example</h2>";
+    h += codeBlock(l.code, true) + outputBlock(l.output, l.outputLabel);
+
+    var p = l.predict;
+    answers.pred = { answer: p.answer, why: p.why, out: p.options[p.answer], file: !!p.test };
+    h += "<h2>Predict the output</h2>";
+    h += "<p>Read the code and decide what it prints before you pick.</p>";
+    h += '<div class="predict">' + codeBlock(p.code) +
+      "<p>" + esc(p.question || "What does this print?") + "</p>" + choicesHtml(p.options, "pred", true) + "</div>";
+
+    h += '<div class="mistake"><h3>Common mistake</h3><p>' + l.mistake + "</p></div>";
+
+    h += "<h2>Quick check</h2>";
+    l.quiz.forEach(function (q, k) {
+      var g = "q" + k;
+      answers[g] = { answer: q.answer, why: q.why };
+      h += '<div class="q"><p>' + esc(q.q) + "</p>" + choicesHtml(q.options, g, false) + "</div>";
+    });
+
+    var pr = l.practice;
+    h += "<h2>Practice</h2><p>" + esc(pr.task) + "</p>";
+    h += "<p>Write it on your own computer first. Open the hint if you get stuck, and the solution to compare.</p>";
+    h += "<details><summary>Hint</summary><div><p style=\"margin:0\">" + esc(pr.hint) + "</p></div></details>";
+    h += "<details><summary>Solution</summary><div>" + codeBlock(pr.solution, true) +
+      outputBlock(pr.output, pr.input ? "Output when you type " + pr.input : "Output") + "</div></details>";
+
+    var d = isDone(i);
+    h += '<div class="lesson-end">';
+    h += '<button class="btn' + (d ? " done" : "") + '" id="doneBtn" aria-pressed="' + d + '">' + (d ? "✓ Marked as done" : "Mark lesson as done") + "</button>";
+    h += '<span class="spacer"></span>';
+    if (i > 0) h += '<a class="btn" href="#/lesson/' + i + '">Previous</a>';
+    if (i < LESSONS.length - 1) h += '<a class="btn primary" href="#/lesson/' + (i + 2) + '">Next: ' + esc(LESSONS[i + 1].title) + "</a>";
+    else h += '<a class="btn primary" href="#/">Back to start</a>';
+    h += "</div></article>";
+    main.innerHTML = h;
+
+    document.getElementById("doneBtn").addEventListener("click", function () {
+      if (isDone(i)) done = done.filter(function (x) { return x !== i; });
+      else done.push(i);
+      save();
+      renderNav(i);
+      var b = this, nowDone = isDone(i);
+      b.classList.toggle("done", nowDone);
+      b.setAttribute("aria-pressed", nowDone);
+      b.textContent = nowDone ? "✓ Marked as done" : "Mark lesson as done";
+    });
+  }
+
+  function renderHome() {
+    codeStore = [];
+    var next = 0;
+    for (var k = 0; k < LESSONS.length; k++) { if (!isDone(k)) { next = k; break; } }
+    var started = done.length > 0;
+    var h = '<article><div class="hero">';
+    h += "<h1>Learn C by writing small programs</h1>";
+    h += '<p class="lede" style="margin:0">Twelve short lessons take you from your first <code>printf</code> to reading and writing files. Each lesson has a working example, a predict-the-output puzzle, a quick check and a practice problem.</p>';
+    h += '<div class="hero-term" aria-label="Example: compiling and running hello.c">' +
+      "<pre><code>" + highlight('#include <stdio.h>\n\nint main(void) {\n    printf("Hello, world!\\n");\n    return 0;\n}') + "</code></pre>" +
+      '<div class="run" id="heroRun"></div></div>';
+    h += '<p style="margin:0"><a class="btn primary" href="#/lesson/' + (next + 1) + '">' +
+      (started ? "Continue with lesson " + (next + 1) : "Start lesson 1") + "</a></p>";
+    h += "</div>";
+
+    h += "<h2>Set up a compiler</h2>";
+    h += "<p>You need a C compiler to run your code. GCC is free and works on every system.</p>";
+    h += '<div class="os">' +
+      "<div><h3>Windows</h3><p>Install MinGW-w64, or an editor that bundles it such as Code::Blocks. Then use <code>gcc</code> from the command prompt.</p></div>" +
+      "<div><h3>macOS</h3><p>Open Terminal and run:</p><pre class=\"cmd\">xcode-select --install</pre></div>" +
+      "<div><h3>Linux</h3><p>On Ubuntu or Debian:</p><pre class=\"cmd\">sudo apt install gcc</pre></div></div>";
+    h += "<p>To compile and run a file called <code>hello.c</code>:</p><pre class=\"cmd\">gcc hello.c -o hello\n./hello</pre>";
+    h += "<p>No computer of your own? Search for an online C compiler, paste the code, and press run.</p>";
+
+    h += "<h2>How to use each lesson</h2>";
+    h += '<ol class="steps">' +
+      "<li><span>Read the short explanation and the example.</span></li>" +
+      "<li><span>Type the example yourself instead of copying it. Your fingers learn the syntax.</span></li>" +
+      "<li><span>Answer the predict-the-output puzzle before you run anything.</span></li>" +
+      "<li><span>Take the quick check, then solve the practice problem on your own.</span></li>" +
+      "<li><span>Mark the lesson as done. Your progress is saved in this browser.</span></li></ol>";
+    if (started) h += '<p><button class="btn" id="resetBtn">Clear my progress</button></p>';
+    h += "</article>";
+    main.innerHTML = h;
+
+    var rb = document.getElementById("resetBtn");
+    if (rb) rb.addEventListener("click", function () {
+      if (confirm("Clear all lessons marked as done?")) { done = []; save(); route(); }
+    });
+    playHero();
+  }
+
+  function playHero() {
+    var el = document.getElementById("heroRun");
+    if (!el) return;
+    var lines = [
+      { t: "$ gcc hello.c -o hello", dim: true },
+      { t: "$ ./hello", dim: true },
+      { t: "Hello, world!", dim: false }
+    ];
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function paint(li, ch) {
+      var h = "";
+      for (var a = 0; a < lines.length; a++) {
+        if (a < li) h += '<span class="' + (lines[a].dim ? "dim" : "") + '">' + esc(lines[a].t) + "</span>\n";
+        else if (a === li) h += '<span class="' + (lines[a].dim ? "dim" : "") + '">' + esc(lines[a].t.slice(0, ch)) + '</span><span class="caret"></span>';
+      }
+      if (li >= lines.length) h += '<span class="dim">$ </span><span class="caret"></span>';
+      el.innerHTML = h;
+    }
+    if (reduce) { paint(lines.length, 0); return; }
+    var li = 0, ch = 0;
+    clearInterval(heroTimer);
+    heroTimer = setInterval(function () {
+      if (li >= lines.length) { clearInterval(heroTimer); paint(li, 0); return; }
+      var line = lines[li];
+      if (!line.dim) { paint(li + 1, 0); li++; return; }
+      ch++;
+      if (ch > line.t.length) { li++; ch = 0; }
+      paint(li, ch);
+    }, 45);
+  }
+
+  function route() {
+    clearInterval(heroTimer);
+    var m = location.hash.match(/^#\/lesson\/(\d+)/);
+    var i = m ? parseInt(m[1], 10) - 1 : -1;
+    if (i < -1 || i >= LESSONS.length) i = -1;
+    renderNav(i);
+    if (i === -1) renderHome(); else renderLesson(i);
+    nav.classList.remove("open");
+    menuBtn.setAttribute("aria-expanded", "false");
+    window.scrollTo(0, 0);
+    var h1 = main.querySelector("h1");
+    if (h1 && document.activeElement && document.activeElement !== document.body) { h1.setAttribute("tabindex", "-1"); h1.focus({ preventScroll: true }); }
+  }
+
+  main.addEventListener("click", function (e) {
+    var copy = e.target.closest(".copy");
+    if (copy) {
+      var src = codeStore[+copy.getAttribute("data-copy")];
+      var ok = function () { copy.textContent = "Copied"; setTimeout(function () { copy.textContent = "Copy"; }, 1500); };
+      var fallback = function () {
+        var ta = document.createElement("textarea");
+        ta.value = src; ta.style.position = "fixed"; ta.style.opacity = "0";
+        document.body.appendChild(ta); ta.select();
+        try { document.execCommand("copy"); ok(); } catch (err) { copy.textContent = "Select and copy"; }
+        document.body.removeChild(ta);
+      };
+      try {
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(src).then(ok, fallback);
+        else fallback();
+      } catch (err) { fallback(); }
+      return;
+    }
+    var c = e.target.closest(".choice");
+    if (c && !c.disabled) {
+      var g = c.getAttribute("data-group");
+      var k = +c.getAttribute("data-k");
+      var a = answers[g];
+      var all = main.querySelectorAll('.choice[data-group="' + g + '"]');
+      all.forEach(function (b) {
+        b.disabled = true;
+        if (+b.getAttribute("data-k") === a.answer) b.classList.add("right");
+      });
+      var correct = k === a.answer;
+      if (!correct) c.classList.add("wrong");
+      var fb = document.getElementById("fb-" + g);
+      var html = '<div class="feedback ' + (correct ? "good" : "nope") + '" role="status"><b>' +
+        (correct ? "Correct." : "Not this one. The right answer is marked in green.") + "</b>" + esc(a.why) + "</div>";
+      if (g === "pred") html = '<div class="term-print' + (a.file ? " file" : "") + '">' + esc(a.out) + "</div>" + html;
+      fb.innerHTML = html;
+    }
+  });
+
+  menuBtn.addEventListener("click", function () {
+    var open = nav.classList.toggle("open");
+    menuBtn.setAttribute("aria-expanded", open ? "true" : "false");
+  });
+
+  window.addEventListener("hashchange", route);
+  route();
+})();
+</script>
+</body>
+</html>
